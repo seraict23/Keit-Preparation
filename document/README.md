@@ -1,4 +1,4 @@
-# KEIT
+# Detailed Development Document - KEIT pre-Project
 
 ## Environment
 - // Lang, Tools
