@@ -159,7 +159,7 @@ tsconfig
 |http|Http|Http객체로부터 의존성 주입|-|
 |response|Response|Http객체로부터 의존성 주입|-|
 |request|(void): Promise\<Response>|일반적인 request|-|
-|postRequest|(void): Promise\<Response>|d|POST request|
+|postRequest|(void): Promise\<Response>|POST request|-|
 |getRequest|(void): Promise\<Response>|GET request|-|
 |fileRequest|(void): Promise\<Response>|파일인 경우, 파일 form-data를 내려받는 method|
 > Response 객체는 Api서버 개발 이후 변경될 수 있음
