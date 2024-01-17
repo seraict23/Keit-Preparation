@@ -3,8 +3,3 @@
  - 배치처리 x 개당 처리ㅇ 처리 여부 판단은 서버에서
 
 2. 로그 역시 서버에서 처리하는 것으로 가정
-
-
-Elastic Search + Logstash + Kibana
-
-Open Search + Fluentd + Open Search Dashboard
