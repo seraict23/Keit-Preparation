@@ -11,7 +11,7 @@
 
 > 모듈 객체를 Domain과 Service, Operation으로 각각 분리. 
 Domain계층의 Object는 기본 로직을, Service계층의 Object는 어플리캐이션 로직을 담당하며, 
-Operation 계층은 Service Object들이 배치된 최종 실행문 형태.
+Operation 계층은 Service Object들이 배치된 최종 실행문 형태. 
 
 ## Directory Structure
 ```
@@ -42,17 +42,27 @@ tsconfig
 ### app
 |Arguments|Type|Description|Note|
 |-|-|-|-|
-|fileManager|FileManager|-|-|
-|workNodeManager|WorkNodeManager|-|-|
+|task|Task||-|
+|inputFile|FileObject||-|
+|outputFile|FileObject||-|
 |taskManager|TaskManager|-|-|
+|fileManager|FileManager|-|-|
+|jobManager|JobManager|-|-|
+|resultManager|ResultManager|-|-|
 |logManager|LogManager|-|-|
-|getNewTask|(void): boolean|서버로부터 새 임무를 받는다.|-|
-|job|(Task): Promise\<void>|워크노드에 작업을 할당하고, 메인 작업(PDF추출) 모듈을 실행한다.|-|
-|finishJob|(void): Promise\<void>|워크노드가 비어있을 경우, 워크노드를 지연삭제하고 임시폴더에 저장된 PDF파일을 삭제한다.|-|
+|runTaskManager|(void): Promise\<void>|서버로부터 새 임무를 받는다.|-|
+|runFileManager|(Task): Promise\<void>|PDF: 임무에 해당하는 파일을 받는다    HWP: 임무를 Json지령문 파일로 변환한다.|-|
+|runJobManager|(void): Promise\<void>|워크노드에 작업을 할당하고 임무에 해당하는 exe파일을 실행한다.|-|
+|runResultManager|(void): Promise\<void>|결과로 나온 파일을 Json파일로 변환하여 서버로 전송한다.|-|
 |run|(void): Promise\<void>|최종 실행 구문. main함수에서 해당 메서드를 호출하여 작업을 시행한다.|-|
 
 > 모든 서비스 계층의 오브젝트로부터 의존성을 주입받는다. 
 > run method는 다른 형제 method들을 활용하여 최종 실행문으로서 역할.
+
+> - 작업대상 서버로부터 불러오기 -> Task 객체
+> - 해당하는 파일 다운로드(pdf) | 생성(hwp) -> File 객체
+> - 작업처리(exe 파일 실행)
+> - 결과보고 Json, Log
 
 ## Service
 > 2계층 모듈. 어플리캐이션 로직을 담당한다.
@@ -62,8 +72,8 @@ tsconfig
 |Arguments|Type|Description|Note|
 |-|-|-|-|
 |file|FileObject|Domain 객체인 FileObject로부터 의존성을 주입받는다.|-|
-|getFileFromTask|(Task): FileObject|임무객체와 파일객체를 매핑한다.|-|
-|ready|(void): Promise\<void>|파일을 작업 디렉토리로 옮긴다|-|
+|getFileFromTask|(Task): FileObject|임무객체에 해당하는 파일을 다운거나 Json으로 생성한다.|-|
+|ready|(void): Promise\<void>|파일을 작업 디렉토리로 옮긴다.|-|
 |finish|(void): Promise\<void>|작업 디렉토리에서 파일을 삭제한다.|-|
 
 ### TaskManager
@@ -77,30 +87,56 @@ tsconfig
 |getNewTask|(void): Promise\<Tasks>|서버로부터 임무를 조회하고 새로운 임무가 있을 경우, 임무 객체 리스트에 추가.|-|
 |popTask|(void): Promise\<Task>|임무 객체 리스트로부터 임무 하나를 빼온다.|-|
 |finishTask|(void): Promise\<void>|임무 객체 리스트로부터 삭제.|-|
+> 서버로부터 임무 검색, 
 
-### WorkNodeManager
+### JobManager
 |Arguments|Type|Description|Note|
 |-|-|-|-|
+|inputFile|FileObject|PDF파일 또는 Json파일|-|
+|outputFile|FileObject|결과파일(Json파일 또는 HWP파일)|-|
 |workNode|WorkNode|WorkNode객체 의존성 주입|-|
-|setNode|(void): Promise\<void>|워크노드에 작업을 할당.|-|
+|executor|Executor|Executor객체 의존성 주입|-|
+|setWorkNode|(void): Promise\<void>|워크노드에 작업을 할당.|-|
+|runExe|(void): Promise\<FileObject>|exe파일 실행|-|
 |checkEmpty|(void): Promise\<boolean>|워크노드가 비어있는지 확인.|-|
 |clearNode|(void): void|워크노드를 비운다.|-|
 
-### Adapter
+### ResultManager
 |Arguments|Type|Description|Note|
 |-|-|-|-|
-|adapter|Executor|Executor객체 의존성 주입|-|
-|runExe|(void): Promise\<void>|Exe파일 실행|-|
-> 주입받은 Executor객체에 들어있는 FileObject객체의 정보를 이용하여 Exe에 파일형태(PDF|JSON)의 arguments 전달.
+|task|Task|Task객체 의존성 주입|-|
+|resultJson|JsonObject||-|
+|resultFile|FileObject||-|
+|httpRequest|HttpRequest||-|
+|buildRequest|(void): Promise\<void>|서버에 전송할 http request 생성|-|
+|reportToServer|(void): Promise\<void>|서버에 결과 전송|-|
+|uploadFileToServer|(void): Promise\<void>|서버에 파일 전송|-|
+> PDF: 결과 Json 전송 / HWP: 결과 Json전송 및 HWP파일 전송
 
-### Jsonify
-// pass
 ### LogManager
-// pass
+|Arguments|Type|Description|Note|
+|-|-|-|-|
+|log|Log|Log객체 의존성 주입|-|
+|httpRequest|HttpRequest|HttpRequest객체 의존성 주입|-|
+|stack|(void): Promise\<void>|로그를 보관|-|
+|stack|(void): Promise\<void>|보관한 로그 배치를 반환|-|
+|stringify|(void): string|로그를 문자열로 변환|-|
+|send|(void): Promise\<void>|서버로 로그를 전송|-|
+
 ## Domain
 > 도메인 객체는 통상적인 Entity 타입의 객체들과 기능적인 도메인 객체로 분류하여 각각 Entity, Util로 분류.
 ## Entity
 > Property 중심의 도메인 객체
+### JsonObject
+|Arguments|Type|Description|Note|
+|-|-|-|-|
+|data|JsonData|전용 객체|-|
+|setStatus|(string): string|상태코드를 편집한다|-|
+|toJson|(void): JSON|Json타입을 반환한다|-|
+|toString|(void): string|string타입을 반환한다|-|
+
+> 구현체: JsonDataInterface
+
 ### FileObject
 |Arguments|Type|Description|Note|
 |-|-|-|-|
@@ -109,6 +145,7 @@ tsconfig
 |move|(string): string|해당 위치로 파일을 옮긴다.|-|
 |delete|(void): void|파일을 삭제|-|
 |changeName|(string): void|파일명 변경|-|
+|isExist|(void): boolean|해당하는 파일이 존재하는지 확인|-|
 ### Log
 |Arguments|Type|Description|Note|
 |-|-|-|-|
@@ -178,9 +215,26 @@ tsconfig
 |rPop|(string): Promise<void>|리스트 타입 값의 마지막 인덱스에서 값 빼내오기|-|
 |disconnect|(void): Promise<void>|서버 연결 종료|-|
 > Redis 사용에 관한 기본적인 기능을 갖춘 Domain 객체
+
+### Jsonify
+|Arguments|Type|Description|Note|
+|-|-|-|-|
+|jsonData|JsonObject|JsonData 객체로부터 의존성 주입|-|
+|get|(string): void|JsonData 객체에 값을 추가|-|
+|eject|(void): Promise<JSON>|Json파일 생성|-|
 ## Common
 ### Constant
+ |name|type|description|
+ |-|-|-|
+ |TaskType|enum class|HWP, PDF|
+
 ### Functions
+ |name|type|description|
+ |-|-|-|
+ |createDirectory|(Path):void|입력한 path에 디렉토리 생성|
+ |clearDirectory|(Path):void|입력한 path 폴더 비우기|
+ |delay|(Time):Promise<void>|입력한 시간 오브젝트 만큼 시간을 보내는 함수|
+
 ### Interfaces
 > - FileInterface
 >```typescript
@@ -224,4 +278,40 @@ tsconfig
 >milisecond: number
 >```
 
+>- JsonDataInterface
+>```typescript
+>file: string
+>createdBy: string
+>createdAt: string
+>type: TaskType
+>status: string
+>content: JsonDataContentInterface
+>```
+
+dependent interfaces
+```typescript
+interface JsonDataContentInterface {
+    text: Array<JsonDataContentTextInterface>
+    table: Array<JsonDataContentTableInterface>
+}
+
+interface JsonDataContentTextInterface {
+    number: number
+    value: string
+}
+
+interface JsonDataContentTableInterface {
+    number: number
+    cell: Array<JsonDataContentTableCellInterface>
+}
+
+interface JsonDataContentTableCellInterface {
+    row: number
+    column: number
+    value: string
+}
+```
+
+
 ## Config
+

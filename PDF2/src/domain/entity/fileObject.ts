@@ -27,6 +27,10 @@ class FileObject {
     changeName(to: string): string {
         return ""
     }
+
+    isExist(): Boolean {
+        return true
+    }
 }
 
 export default FileObject
