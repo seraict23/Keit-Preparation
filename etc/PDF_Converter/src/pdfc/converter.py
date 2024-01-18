@@ -8,7 +8,7 @@ from ..utils.gen_py_killer import genpyKiller
 class PDFConverter:
     def __init__(self, data) :
         self.__filename = data['filename']
-        self.__title = None
+        self.__title = data['title']
         self.__page = int(data['page'])
         self.__path = str(os.getcwd())
         self.__tempFolder = data['temp_folder']
@@ -67,7 +67,7 @@ class PDFConverter:
                     text = str(page.extract_text())
 
                     if self.__title in text :
-                        print("crop page")
+                        print("crop page by title")
                         writer = PdfWriter()
                         writer.add_page(page)
                         with open(cropped_pdf_folder + "\\_result.pdf", "wb") as fp:
@@ -78,7 +78,7 @@ class PDFConverter:
                     text = str(page.extract_text())
 
                     if num_page == self.__page :
-                        print("crop page")
+                        print("crop page by title")
                         writer = PdfWriter()
                         writer.add_page(page)
                         with open(cropped_pdf_folder + "\\_result.pdf", "wb") as fp:

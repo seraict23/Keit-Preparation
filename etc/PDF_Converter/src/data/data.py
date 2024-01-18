@@ -9,6 +9,8 @@ class Client:
         self.RESULT_FOLDER = None
         self.RESULT_FILENAME = None
         self.GENPY = os.environ.get("GENPY")
+        self.PAGE = None
+        self.TITLE = None
         self.con = None
 
     def load(self):
@@ -31,7 +33,8 @@ class Client:
         self.RESULT_FOLDER = result[2]
         self.RESULT_FILENAME = result[3]
         self.PAGE = result[4]
-        print(self.FILENAME, self.TEMP_FOLDER, self.RESULT_FOLDER, self.RESULT_FILENAME, self.PAGE)
+        self.TITLE = result[5]
+        print(self.FILENAME, self.TEMP_FOLDER, self.RESULT_FOLDER, self.RESULT_FILENAME, self.PAGE, self.TITLE)
 
         self.con.close()
 
@@ -43,10 +46,12 @@ class Client:
 
         cur.execute('''DROP TABLE IF EXISTS configuration''')        
         cur.execute('''CREATE TABLE configuration
-                    (filename text, tempfolder text, resultfolder text, resultfilename text, page text)''')
+                    (filename text, tempfolder text, resultfolder text, resultfilename text, 
+                    page text, 
+                    title text default null)''')
 
 
-        cur.execute("INSERT INTO configuration VALUES (?, ?, ?, ?, ?)", dataArray)
+        cur.execute("INSERT INTO configuration VALUES (?, ?, ?, ?, ?, ?)", dataArray)
 
         self.con.commit()
         self.con.close()
@@ -64,6 +69,7 @@ class Client:
         result['result_filename'] = self.RESULT_FILENAME
         result['page'] = self.PAGE
         result['genpy'] = self.GENPY
+        result['title'] = self.TITLE
 
         return result
 
