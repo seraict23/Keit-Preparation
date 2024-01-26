@@ -146,6 +146,10 @@ tsconfig
 |delete|(void): void|파일을 삭제|-|
 |changeName|(string): void|파일명 변경|-|
 |isExist|(void): boolean|해당하는 파일이 존재하는지 확인|-|
+> path: 파일명을 포함한 abs path
+> folder: 폴더
+> dir: 파일명을 제외한 directory
+
 ### Log
 |Arguments|Type|Description|Note|
 |-|-|-|-|
