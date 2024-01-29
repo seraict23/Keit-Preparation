@@ -60,7 +60,6 @@ class RedisClient {
 
         return result;
     }
-
 }
 
 export default RedisClient;

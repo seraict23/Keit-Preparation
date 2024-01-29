@@ -1,7 +1,6 @@
 import spawn from 'child_process'
 import FileObject from '../entity/fileObject';
 import Config from '../../config';
-import path from 'path';
 
 const exe = spawn.spawn 
 

@@ -1,5 +1,5 @@
 import { TaskType } from "../../common/constant/types";
-import {JsonDataInterface} from "../../common/interfaces/jsonDataInterface";
+import { JsonDataInterface } from "../../common/interfaces/jsonDataInterface";
 
 class JsonData implements JsonDataInterface{
     constructor(file: string, createdBy: string, type: TaskType, content: any) {

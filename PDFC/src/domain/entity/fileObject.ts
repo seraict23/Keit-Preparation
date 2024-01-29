@@ -1,4 +1,3 @@
-
 import { FileNotInitializedError } from "../../common/error/FileError"
 import FileInterface from "../../common/interfaces/fileInterface"
 import Config from "../../config"
@@ -90,4 +89,4 @@ class FileObject {
     }
 }
 
-export default FileObject
+export default FileObject;

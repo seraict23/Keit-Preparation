@@ -6,6 +6,7 @@ import { TaskType } from "../../src/common/constant/types"
 import WorkNode from "../../src/domain/entity/workNode"
 import delay from "../../src/common/functions/delay"
 import RedisClient from "../../src/domain/util/redisClient"
+import Task from "../../src/domain/entity/task"
 
 test('fileObject exist test', () => {
     const fileObj = new FileObject('test.txt', "")
@@ -64,8 +65,8 @@ test('json object: test', () => {
 
     const jsonResult = jsonObject.toJson()
     const stringResult = jsonObject.toString()
-    // console.log(jsonResult)
-    // console.log(stringResult)
+    console.log(jsonResult)
+    console.log(stringResult)
     expect(jsonResult).not.toBeNull()
     expect(stringResult).not.toBeNull()
 })
@@ -92,4 +93,20 @@ test('WorkNode: test', async () => {
 
     const isOccupied3 = await workNode.isOccupied(redisCleint)
     expect(isOccupied3).toBeFalsy()
+})
+
+test('task: test', () => {
+    const task = new Task(
+        "hello", 
+        "spark", 
+        TaskType.PDF, 
+        new FileObject('test.txt'), 
+        {
+            first: 'hello',
+            second: 'world'
+        }
+    )
+    expect(task.id).toBe("hello")
+    expect(task.type).toBe("pdf")
+    expect(task.data.second).toBe('world')
 })

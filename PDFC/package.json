@@ -22,8 +22,10 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@types/winston": "^2.4.4",
     "axios": "^1.6.5",
-    "redis": "^4.6.12"
+    "redis": "^4.6.12",
+    "winston": "^3.11.0"
   },
   "jest": {
     "transform": {

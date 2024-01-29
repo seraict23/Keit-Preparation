@@ -34,7 +34,6 @@ class WorkNode {
         redisClient || (redisClient = new RedisClient())
         await redisClient.deleteSlow(Config.WORKNODE)
     }
-
 }
 
 export default WorkNode;
