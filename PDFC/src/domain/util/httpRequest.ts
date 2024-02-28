@@ -36,6 +36,10 @@ class HttpRequest {
 
     response?: Response;
 
+    setData(data:any) {
+        this.http.data = data;
+    }
+
     setMethod(method: string) {
         this.http.method = method
     }

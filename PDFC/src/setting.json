@@ -1,0 +1,10 @@
+{
+    "fileFolder": "data/file",
+    "tempFolder": "data/tmp",
+    "workNodeName": "work_node_asdf",
+    "exeFileFolder": "exe",
+    "exeFileName": "test.py",
+    "exeResultFolder": "data/result",
+    "logFolder": "logs",
+    "logUrl": "#"
+}

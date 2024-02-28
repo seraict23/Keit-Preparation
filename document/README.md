@@ -125,8 +125,10 @@ tsconfig
 
 ## Domain
 > 도메인 객체는 통상적인 Entity 타입의 객체들과 기능적인 도메인 객체로 분류하여 각각 Entity, Util로 분류.
+
 ## Entity
 > Property 중심의 도메인 객체
+
 ### JsonObject
 |Arguments|Type|Description|Note|
 |-|-|-|-|
@@ -158,14 +160,17 @@ tsconfig
 |fileName|string|해당 작업이 실행된 파일|-|
 |message|string|메시지|-|
 |time|string|시간|-|
+
 ### Task
 |Arguments|Type|Description|Note|
 |-|-|-|-|
 |id|string|임무 ID|-|
 |name|string|임무명|-|
 |type|string|임무 타입(PDF\|HWP)|-|
-|file|string|연관 파일이 있는 경우(PDF)|-|
+|file|FileInterface|연관 파일이 있는 경우(PDF)|-|
 |data|string|json data가 있는 경우(HWP)|-|
+> file > FileInterface로 수정
+
 ### Tasks
 |Arguments|Type|Description|Note|
 |-|-|-|-|
@@ -176,6 +181,7 @@ tsconfig
 |add|(void): void|임무리스트에 임무 추가|-|
 |remove|(void): void|임무 삭제|-|
 |fetch|(Task): Array<Task>|임무 리스트에 해당 임무가 없는 경우 추가|-|
+
 ### WorkNode
 |Arguments|Type|Description|Note|
 |-|-|-|-|
@@ -185,8 +191,10 @@ tsconfig
 |isOccupied|(void): boolean|워크노드가 점유중인지 확인|-|
 |clearWorkNode|(void): void|워크노드 비우기|-|
 |clearWorkNodeGraceFully|(Time): void|워크노드 Time객체(초\|밀리초)만큼 기다렸다 비우기|-|
+
 ## Util
 > 기능 중심의 도메인 객체
+
 ### Exec
 |Arguments|Type|Description|Note|
 |-|-|-|-|
@@ -204,6 +212,7 @@ tsconfig
 |getRequest|(void): Promise\<Response>|GET request|-|
 |fileRequest|(void): Promise\<Response>|파일인 경우, 파일 form-data를 내려받는 method|
 > Response 객체는 Api서버 개발 이후 변경될 수 있음
+
 ### RedisClient
 |Arguments|Type|Description|Note|
 |-|-|-|-|

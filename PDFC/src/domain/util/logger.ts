@@ -24,11 +24,11 @@ const logger = winston.createLogger({
     // - Write all logs with importance level of `info` or less to `combined.log`
     //
     new winston.transports.File({ 
-      dirname: Config.FILE_FOLDER_PATH,
+      dirname: Config.LOG_FOLDER_PATH,
       filename: 'error.log', 
       level: 'error' }),
     new winston.transports.File({ 
-      dirname: Config.FILE_FOLDER_PATH,
+      dirname: Config.LOG_FOLDER_PATH,
       filename: 'combined.log' }),
   ],
 });

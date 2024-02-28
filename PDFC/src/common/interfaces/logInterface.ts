@@ -3,7 +3,7 @@ interface LogInterface {
     status: string,
     moduleName: string,
     message: string,
-    time: string
+    time?: string
 }
 
 export default LogInterface;

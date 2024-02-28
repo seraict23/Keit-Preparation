@@ -1,12 +1,9 @@
 import sys, os
 
-rootPath = sys.argv[1]
-toPath = sys.argv[2]
+firstPath = sys.argv[1]
+secondPath = sys.argv[2]
 
-f = open(f"{rootPath}", "r")
-data = f.readline()
-f.close()
+print(firstPath, secondPath)
 
-f2 = open(f"{toPath}", "w")
-f2.write(data)
-f2.close()
+with open('test.txt', "w", encoding='utf-8') as fs:
+    fs.write(firstPath + secondPath)

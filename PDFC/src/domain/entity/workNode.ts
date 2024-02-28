@@ -1,11 +1,12 @@
 import Config from "../../config";
 import RedisClient from "../util/redisClient";
+import Task from "./task";
 
 class WorkNode {
-    constructor() {
+    constructor(task: Task) {
         // let today = new Date()
         // this.id = today.toLocaleTimeString()
-        this.id = Date.now().toString()
+        this.id = Date.now().toString() || task.id;
     }
 
     id: string;
