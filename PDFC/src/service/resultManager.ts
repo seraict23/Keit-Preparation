@@ -1,18 +1,18 @@
+import { ResultReportDto } from "../common/interfaces/dto/resultReport";
 import FileObject from "../domain/entity/fileObject";
 import JsonObject from "../domain/entity/jsonObject"
 import Task from "../domain/entity/task";
 import HttpRequest from "../domain/util/httpRequest";
 
 class ResultManager {
-    constructor(resultJson: JsonObject, resultFile: FileObject) {
+    constructor(resultJson: ResultReportDto) {
         this.resultJson = resultJson;
-        this.resultFile = resultFile;
         this.httpRequest = new HttpRequest("url", resultJson);
     }
     
     task: Task;
 
-    resultJson: JsonObject;
+    resultJson: ResultReportDto;
 
     resultFile: FileObject;
 
@@ -28,7 +28,7 @@ class ResultManager {
     }
 
     async run() {
-        await this.reportToServer();
+        // await this.reportToServer();
     }
 }
 

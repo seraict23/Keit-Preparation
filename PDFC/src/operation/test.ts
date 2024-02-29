@@ -1,3 +1,4 @@
+import { ResultReportDto } from "../common/interfaces/dto/resultReport";
 import Task from "../domain/entity/task";
 import FileManager from "../service/fileManager";
 import JobManager from "../service/jobManager";
@@ -17,5 +18,7 @@ export default async function testmain() {
     const json = fileManager.jsonOrderFile;
 
     const jobManager = new JobManager(task, json, pdf);
-    await jobManager.run()
+    const resultReport: ResultReportDto = await jobManager.run()
+
+    const resultManager = new ResultManager(resultReport);
 }

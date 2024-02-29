@@ -2,21 +2,22 @@
 
 import { TaskType } from "../common/constant/types";
 import delay from "../common/functions/delay";
+import { ResultReportDto } from "../common/interfaces/dto/resultReport";
+import Config from "../config";
 import FileObject from "../domain/entity/fileObject";
-import JsonObject from "../domain/entity/jsonObject";
 import Task from "../domain/entity/task";
 import WorkNode from "../domain/entity/workNode";
 import Executor from "../domain/util/exe";
 
 class JobManager {
-    constructor(task: Task, jsonFile: FileObject, pdfFile?:FileObject){
+    constructor(task: Task, jsonFile: FileObject, pdfFile?:FileObject) {
         this.jsonOrderFile = jsonFile;
         this.pdfFile = pdfFile;
         this.workNode = new WorkNode(task);
 
-        const jsonFilePath = (jsonFile.path || "") + "/" + (jsonFile.name || "");
-        const pdfFilePath = ((pdfFile && pdfFile.path) || "") + "/" + ((pdfFile && pdfFile.name) || "");
-        this.executor = new Executor(jsonFilePath, pdfFilePath);
+        const jsonFileName = jsonFile.name || "";
+        const pdfFileName = (pdfFile && pdfFile.name) || undefined;
+        this.executor = new Executor(jsonFileName, pdfFileName);
 
         this.task = task;
     }
@@ -25,7 +26,7 @@ class JobManager {
     
     pdfFile?: FileObject;
     
-    outputFile?: FileObject = undefined;
+    resultReport?: ResultReportDto;
 
     workNode: WorkNode;
 
@@ -34,9 +35,8 @@ class JobManager {
     task: Task;
 
     async ready() {
-        return this.jsonOrderFile.isExist() && (this.task.type == TaskType.PDF ? this.pdfFile!.isExist() : true)
+        return this.jsonOrderFile.isExist() && ((this.task.type == TaskType.PDF) ? this.pdfFile!.isExist() : true)
     }
-
 
     async runExe() {
         // this.executor.runExe();
@@ -48,19 +48,17 @@ class JobManager {
     }
 
     async getOutput() {
-
-    }
-
-    async makeOutput(fileName: string, dir: string): Promise<JsonObject> {
-        this.outputFile = new FileObject(fileName, dir);
-        return new JsonObject("", "", TaskType.HWP, {});
+        const outputReportFile = new FileObject(this.jsonOrderFile.name, Config.EXE_RESULT_PATH);
+        const jsonString = await outputReportFile.readIfJson();
+        this.resultReport = JSON.parse(jsonString) as ResultReportDto;
+        outputReportFile.delete();
     }
 
     async clearWorkNode() {
         this.workNode.clearWorkNodeGracefully();
     }
 
-    async run() : Promise<void> {
+    async run() : Promise<ResultReportDto> {
         console.log(this.executor.argv1, this.executor.argv2)
         console.log(this.workNode.id)
 
@@ -73,8 +71,9 @@ class JobManager {
 
         // await this.setWorkNode();
         await this.runExe();
-        // await this.getOutput();
-        // await this.makeOutput();
+        await this.getOutput();
+
+        return this.resultReport!;
     }
 }
 

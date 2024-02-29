@@ -78,6 +78,18 @@ class FileObject implements FileInterface {
         const result = fs.existsSync(this.path)
         return result
     }
+
+    async readIfJson(): Promise<string> {
+        if(this.name!.indexOf('json') == -1) {
+            throw new Error("this file is not json")
+        }
+        
+        const jsonFilePathToRead = path.join(this.path!, this.name!)
+        const jsonFile = fs.readFileSync(jsonFilePathToRead, 'utf-8')
+        const jsonData = JSON.parse(jsonFile)
+
+        return JSON.stringify(jsonData);
+    }
 }
 
 export default FileObject;

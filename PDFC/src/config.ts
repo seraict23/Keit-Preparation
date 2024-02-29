@@ -17,6 +17,7 @@ export default class Config {
     static readonly TEMP_FOLDER_PATH = path.join(path.resolve(), setting.tempFolder)
     static readonly WORKNODE = setting.workNodeName
     static readonly EXE_FILE_PATH = path.join(path.resolve(), setting.exeFileFolder, setting.exeFileName)
+    static readonly EXE_RESULT_PATH = path.join(path.resolve(), setting.exeResultFolder)
     static readonly LOG_FOLDER_PATH = path.join(path.resolve(), setting.logFolder)
     static readonly LOG_URL = setting.logUrl
 }

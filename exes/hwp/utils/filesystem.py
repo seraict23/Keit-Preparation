@@ -8,13 +8,16 @@ class FileSystem:
         self.file_path = './' + folder_name + '/' + input_file_name
 
     def write_json(self, json_data):
+        '''
+        json data는 object 타입(not string)
+        '''
         with open(self.file_path, 'w', encoding='UTF-8') as f:
             json.dump(json_data, f)
 
     def write_pydantic(self, pydantic_data):
         json_data = json.loads(pydantic_data.model_dump_json())
         with open(self.file_path, 'w', encoding='UTF-8') as f:
-            json.dump(json_data, f)     
+            json.dump(json_data, f)
     
     def read(self) -> str:
         with open(self.file_path, 'r') as f:
@@ -24,5 +27,4 @@ class FileSystem:
     def read_json_to_dto(self):
         json_data = self.read()
         result = InputOrderDto(**json_data)
-
         return result
