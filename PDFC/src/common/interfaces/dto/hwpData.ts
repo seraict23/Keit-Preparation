@@ -1,28 +1,30 @@
 export interface HWPDataJson {
-    string: StrObject[],
-    table: TableObject[],
+    string: StrObject[]
+    table: TableObject[]
     image: ImgObject[]
 }
 
 interface StrObject {
-    key: string,
+    key: string
     value: string
 }
 
 interface TableObject {
-    key: string,
+    key: string
     value: TableCell[]
 }
 
 interface TableCell {
-    row: number,
-    col: number,
+    row: number
+    col: number
     value: string
 }
 
 interface ImgObject {
-    key: string,
+    key: string
     url: string
+    width: number
+    height: number
 }
 
 // interface MetaObject {

@@ -16,6 +16,8 @@ class TableObject(BaseModel):
 class ImgObject(BaseModel):
     key: str
     url: str
+    width: int
+    height: int
 
 class MetaObject(BaseModel):
     filename: str

@@ -1,7 +1,7 @@
 {
     "meta": {
-        "filename": "...",
-        "template": "hello"
+        "filename": "hello_test2.hwp",
+        "template": "hi.hwp"
     },
     "string": [
         {"key": "string_no1", "value": "value_1"},
@@ -10,11 +10,13 @@
     "table": [
         {"key": "table_no1",
         "value": [
-            {"col": "col_1", "row": "row_2", "value": "value_1"},
-            {"col": "col_2", "row": "row_2", "value": "value_2"}
+            {"col": "0", "row": "0", "value": "value00"},
+            {"col": "1", "row": "0", "value": "value10"},
+            {"col": "0", "row": "1", "value": "value01"},
+            {"col": "1", "row": "1", "value": "value11"}
         ]}
     ],
     "image": [
-        {"key": "img_no1", "url": "localhost"}
+        
     ]
 }

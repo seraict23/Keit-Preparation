@@ -1,1 +1,1 @@
-from .hwp_gen import *
+from hwp.hwp_gen import *

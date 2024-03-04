@@ -18,3 +18,16 @@ class RedisClientManager:
 
     def delete_slow(self, key):
         self.con.set(key, "", 3)
+
+    def push_head(self, key, value):
+        self.con.lpush(key, value)
+    
+    def pop_head(self, key):
+        return self.con.lpop(key)
+
+    def pop_tail(self, key):
+        return self.con.rpop(key)
+
+    def get_length_of_list(self, key):
+        return self.con.llen(key)
+

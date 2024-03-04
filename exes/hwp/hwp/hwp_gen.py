@@ -1,16 +1,23 @@
+from threading import Thread
+import win32com.client as win32
+import pythoncom
 from dto import HwpResult
 from dto import InputOrderDto
-from ..settings import *
+from settings import *
 from pathlib import Path
-import shutil, json
+import shutil, json, os
+
+from utils.redis_cli import RedisClientManager
 
 class HwpGenerator:
     def __init__(self, json_data: InputOrderDto):
-        self.file_folder = INPUT_FILE_FOLDER
+        self.file_folder = INPUT_FILE_FOLDER.replace('/', '\\')
         self.filename = json_data.meta.filename
 
-        self.template_folder = TEMPLATE_FOLDER
+        self.template_folder = TEMPLATE_FOLDER.replace('/', '\\')
         self.template = json_data.meta.template
+
+        self.result_folder = RESULT_FILE_FOLDER.replace('/', '\\')
 
         self.hwp = None
         self.hwp_filename = ""
@@ -24,27 +31,31 @@ class HwpGenerator:
 
     def before_start(self):
         shutil.copyfile(
-            './'+self.template_folder + '/' + self.template_folder, 
-            './'+self.file_folder + '/' + self.filename, 
+            './'+self.template_folder + '/' + self.template, 
+            './'+self.file_folder + '/' + self.filename,
             )
         pass
 
     def open(self):
-        BASE_DIR = Path(__file__).resolve()
-        PATH = str(BASE_DIR)+"/"+self.file_folder+"/"+self.filename
+        BASE_DIR = Path(__file__).resolve().parent.parent
+        PATH = os.path.join(str(BASE_DIR), self.file_folder, self.filename)
+
+        print("open path:", PATH)
 
         hwp = win32.gencache.EnsureDispatch("HWPFrame.HwpObject")
-        hwp.XHwpWindows.Item(0).Visible = False
+        hwp.XHwpWindows.Item(0).Visible = True
         hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample")
 
         hwp.Open(PATH, "HWP", "forceopen:true")
         self.hwp = hwp
 
     def save_and_quit(self):
-        BASE_DIR = Path(__file__).resolve()
-        # result_path = str(BASE_DIR)+"/"+self.result_folder+"/"+self.filename
-        # hwp.SaveAs(result_path)
-        self.hwp.Save()
+        BASE_DIR = Path(__file__).resolve().parent.parent
+        RESULT_PATH = os.path.join(str(BASE_DIR), self.result_folder, self.filename)
+
+        print("save path:", RESULT_PATH)
+        self.hwp.SaveAs(RESULT_PATH)
+        # self.hwp.SaveAs()
         self.hwp.Quit()
 
     def put_string(self):
@@ -52,10 +63,10 @@ class HwpGenerator:
         field_list = self.hwp.GetFieldList().split("\x02")
 
         for i in data:
-            if i in field_list:
-                self.hwp.PutFieldText(i, data[i])
+            if i.key in field_list:
+                self.hwp.PutFieldText(i.key, i.value)
             else:
-                self.error_list.append('{i} 데이터에 해당하는 필드가 템플릿 내에 존재하지 않습니다.')
+                self.error_list.append('{i.key}에 해당하는 필드가 템플릿 내에 존재하지 않습니다.')
 
     def put_table(self):
         data = self.table_data
@@ -78,30 +89,40 @@ class HwpGenerator:
                     
                     text_idx += 1
 
-            if (row<row_count-1) :
-                self.hwp.HAction.Run("MoveDown")
-                self.hwp.HAction.Run("TableColBegin")
+                if (row<row_count-1) :
+                    self.hwp.HAction.Run("MoveDown")
+                    self.hwp.HAction.Run("TableColBegin")
 
     def put_image(self):
-        pass
+        for img in self.image_data:
+    
+            self.hwp.MoveToField(img.key, True, False, False)
+            self.hwp.InsertPicture(img.url, Embedded=True)
+            self.hwp.FindCtrl()
+
+            # 크기 변경
+            self.hwp.HAction.GetDefault("ShapeObjDialog", self.hwp.HParameterSet.HShapeObject.HSet)
+            self.hwp.HParameterSet.HShapeObject.Width = self.hwp.MiliToHwpUnit(img.width)
+            self.hwp.HParameterSet.HShapeObject.Height = self.hwp.MiliToHwpUnit(img.height)
+            self.hwp.HAction.Execute("ShapeObjDialog", self.hwp.HParameterSet.HShapeObject.HSet)
 
     def after_finish(self):
-        pass
+        BASE_DIR = Path(__file__).resolve().parent.parent
+        PATH = os.path.join(str(BASE_DIR), self.file_folder, self.filename)
+        os.remove(PATH)
 
     def run(self):
         self.before_start()
-        # self.open()
-        # self.put_string()
-        # self.put_table()
-        # self.put_image()
-        # self.save_and_quit()
+        self.open()
+        self.put_string()
+        self.put_table()
+        self.put_image()
+        self.save_and_quit()
         self.after_finish()
 
-        return HwpResult.model_validate_json(json.dumps({
-            "success": True,
-            "hwp_file": self.hwp_filename,
-            "error": self.error_list
-        }))
+        print(self.error_list)
+
+        return self.error_list
 
 
 class HwpRunner(Thread):
@@ -117,9 +138,11 @@ class HwpRunner(Thread):
         # 서브 스레드에서 COM 객체를 사용하려면 COM 라이브러리를 초기화 해야함
         pythoncom.CoInitialize()
 
-        result = HwpGenerator(self.param).run()
+        errors = HwpGenerator(self.param).run()
+
+        redis_cli = RedisClientManager()
+        for i in errors:
+            redis_cli.push_head('hwp_work_node_errors', i)
 
         # 사용 후 uninitialize
         pythoncom.CoUninitialize()
-
-        return result

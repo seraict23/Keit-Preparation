@@ -11,13 +11,13 @@ class FileSystem:
         '''
         json data는 object 타입(not string)
         '''
-        with open(self.file_path, 'w', encoding='UTF-8') as f:
-            json.dump(json_data, f)
+        with open(self.file_path, 'w', encoding='utf8') as f:
+            json.dump(json_data, f, ensure_ascii=False)
 
     def write_pydantic(self, pydantic_data):
         json_data = json.loads(pydantic_data.model_dump_json())
-        with open(self.file_path, 'w', encoding='UTF-8') as f:
-            json.dump(json_data, f)
+        with open(self.file_path, 'w', encoding='utf8') as f:
+            json.dump(json_data, f, ensure_ascii=False)
     
     def read(self) -> str:
         with open(self.file_path, 'r') as f:

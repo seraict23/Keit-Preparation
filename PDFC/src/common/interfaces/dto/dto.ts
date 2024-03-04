@@ -2,7 +2,7 @@
 
 
 interface PDFFileJson {
-    filename: string,
+    filename: string
     data: any
 }
 
